@@ -12,8 +12,8 @@ np.random.seed(1)
 
 ###############################################################################
 
-def backtest(classes, input, output):
-	for sequence in xrange(input.shape[0]):
+def backtest(classes, input_, output):
+	for sequence in xrange(input_.shape[0]):
 		name = random.randint(100000,999999)
 		cats = '<input type="radio" name="cat_select" onclick="highlight();">\n'.join([x for x in classes])
 		doc = """
@@ -33,7 +33,7 @@ def backtest(classes, input, output):
 				%s
 				</div>
 			</body>
-		</html>""" % (name, cats, mat2str(input[sequence]))
+		</html>""" % (name, cats, mat2str(input_[sequence]))
 		form = '['+','.join(['%0.2f' for x in xrange(output.shape[-1])])+'],'
 		last_elem = '['+','.join(['0.0' for x in xrange(output.shape[-1])])+']'
 		np.savetxt('results/%s_meta.js' % name, output[sequence],fmt=form,delimiter=',',header='var colors=[',footer=last_elem+']',comments='')
@@ -55,8 +55,8 @@ def clean(dname):
 
 	print('Cleaning %s...' % dname)
 	for root, dirs, files in os.walk(dname):
-		for file in files:
-			fname = root+'/'+file
+		for file_ in files:
+			fname = root+'/'+file_
 			with open(fname, 'r') as f:
 				text = re.sub('\s+', ' ', f.read())
 			with open(fname, 'w') as f:
@@ -65,7 +65,7 @@ def clean(dname):
 # Sample a directory and all subdirectories
 def sample(dname, window=400, size=100):
 
-	print('Sampling...')
+	print('Sampling...' )
 	ncat = {dname:size}  # Samples per category, based on directory tree
 	nfile = []           # Samples per file, based on relative filesize
 	classes = []         # Named classes, based on folder names
@@ -81,8 +81,8 @@ def sample(dname, window=400, size=100):
 
 		# Calculate size of category
 		catsize = sum([os.path.getsize(root+'/'+file) for file in files])
-		for file in files:
-			fpath = root+'/'+file
+		for file_ in files:
+			fpath = root+'/'+file_
 			ntimes = int(round(ncat[root]*os.path.getsize(fpath)/float(catsize)))
 			if ntimes:
 				nfile.append((fpath, ntimes))
@@ -94,13 +94,13 @@ def sample(dname, window=400, size=100):
 	i = 0
 	shuff = range(nsamples)
 	random.shuffle(shuff)
-	for file in nfile:
-		target = np.tile([1 if x in file[0].split('/') else 0 for x in classes], (1, window, 1))
-		for _ in xrange(file[1]):
+	for file_ in nfile:
+		target = np.tile([1 if x in file_[0].split('/') else 0 for x in classes], (1, window, 1))
+		for _ in xrange(file_[1]):
 			if not i % 1000:
 				print('%0.2f%% Done' % (100.0*i/nsamples))
-			with open(file[0]) as f:
-				f.seek(random.randint(0, os.path.getsize(file[0])-window))
+			with open(file_[0]) as f:
+				f.seek(random.randint(0, os.path.getsize(file_[0])-window))
 				inMatrix[shuff[i]] = str2mat(f.read(window))
 				targMatrix[shuff[i]] = target
 				i += 1

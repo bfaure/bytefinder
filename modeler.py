@@ -65,11 +65,11 @@ def run(model, inMatrix):
 def build(inShape, targShape):
 
 	print("Building Model...")
-	input = Input(inShape[1:])
+	input_ = Input(inShape[1:])
 	forward = LSTM(output_dim=targShape[-1]*4, return_sequences=True)(input)
-	backward = LSTM(output_dim=targShape[-1]*4, return_sequences=True, go_backwards=True)(input)
+	backward = LSTM(output_dim=targShape[-1]*4, return_sequences=True, go_backwards=True)(input_)
 	output = TimeDistributed(Dense(targShape[-1], activation='softmax'))(forward, backward)
-	return Model(input=input, output=output)
+	return Model(input=input_, output=output)
 
 # Train model
 def train(model, inMatrix, targMatrix):
